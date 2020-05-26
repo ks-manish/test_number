@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Foo Bar</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"
+    ></script>
+</head>
+<body>
+<div class="light-text-box" id='testDiv'>
+    <form id='getFooBar' action="/foobar" method="POST">
+        <label for="inputNumber">Enter a number:</label><br>
+        <input type="text" name="inputNumber" id="inputNumber" value="" placeholder="Enter a number:">
+        <input type="button" value="Show Result" onclick="showResult();" class="btn btn-sm btn-success">
+    </form>
+    <br>
+    <label for="results_2" id='resultLabel' style="display:None">Results:</label><br>
+    <input type="text" id="results_2" value='' style="display:None">
+<div class="bs-alerts" id = "alert_placeholder">
+</div>
+</div>
+
+
+<style>
+.bs-alerts{
+    margin: 20px;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    width: 97%;
+    z-index:9999; 
+    border-radius:0px
+}
+#testDiv {
+    position:fixed;
+    top: 50%;
+    left: 50%;
+    width:30em;
+    height:18em;
+    margin-top: -9em; 
+    margin-left: -15em;
+    //border: 1px solid #ccc;
+    //background-color: #f3f3f3;
+}
+</style>
+
+<script>
+    function showResult() {
+        $.ajax({
+				url: '/get_result/',
+				method: 'post',
+				data: {'number': $('#inputNumber').val()},
+				error: function(response) {
+					displayAlert('error', response.message)
+					}
+				}).done(function(response) {
+					console.log(response.data);
+					if (response.data != null) {
+						if (response.data.length == 1) {
+							console.log(response.data[0]);
+							console.log(document.getElementById('results_2'));
+							displayAlert('success', response.data[0]);
+							document.getElementById('results_2').style = "display:null";
+							document.getElementById('resultLabel').style = "display:null";
+							document.getElementById('results_2').value= response.data[0];
+							}
+						else if (response.data.length == 2) {
+							displayAlert('success', response.data[0]+ ' and ' + response.data[1]);
+							document.getElementById('results_2').style = "display:null";
+							document.getElementById('resultLabel').style = "display:null";
+							document.getElementById('results_2').value= response.data[0]+ ' and ' + response.data[1];
+							}
+						else {
+							document.getElementById('results_2').style = "display:None";
+							document.getElementById('resultLabel').style = "display:None";
+							displayAlert('warning', 'Provided number is not divisible by 3 nor 5');
+							}
+					} else {
+							document.getElementById('results_2').style = "display:None";
+							document.getElementById('resultLabel').style = "display:None";
+						displayAlert('warning', 'Provided number is not divisible by 3 nor 5');
+					}
+			});
+		}
+	function displayAlert(type, message) {
+		switch(type) {
+			case 'error':
+				$('#alert_placeholder').html('<div class="alert alert-danger alert-dismissible fade show"><strong>Error!</strong> ' +message+ '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+				break;
+			case 'warning':
+				$('#alert_placeholder').html('<div class="alert alert-warning alert-dismissible fade show"><strong>Warning!</strong> ' +message+ '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+				break;
+			case 'info':
+				$('#alert_placeholder').html('<div class="alert alert-info alert-dismissible fade show"><strong>Info!</strong> ' +message+ '<button type="button" class="close" data-dismiss="alert">&times;</button></div>')
+				break;
+			case 'success':
+				$('#alert_placeholder').html('<div class="alert alert-success alert-dismissible fade show"><strong>Success!</strong> ' +message+ '<button type="button" class="close" data-dismiss="alert">&times;</button></div>')
+				break;
+			default:
+				$('#alert_placeholder').html('<div class="alert alert-info alert-dismissible fade show"><strong>Info!</strong> ' +message+ '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+		}
+		setTimeout(function() {
+			$(".alert").fadeTo(1000, 0).slideUp(1000, function(){
+			$(this).remove(); 
+			});
+		}, 20000);
+		};
+</script>
+
+</body>
+</html>

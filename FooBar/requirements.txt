@@ -1,0 +1,4 @@
+django
+pytest
+requests
+selenium
